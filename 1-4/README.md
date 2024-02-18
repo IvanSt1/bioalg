@@ -41,19 +41,8 @@
 Генетические алгоритмы представляют собой мощный инструмент для решения широкого круга оптимизационных задач, особенно тех, которые трудно поддаются анализу с помощью классических методов. Они показывают высокую эффективность в многокритериальной и мультимодальной оптимизации, а также в задачах, где пространство решений имеет сложную структуру. Несмотря на определенные недостатки, такие как сложность настройки параметров и потенциальная вычислительная затратность, исследования и разработки последних лет значительно расширили возможности и области применения ГА.
 
 ### Список источников информации
-
-Книги
-
-Goldberg, D.E. "Genetic Algorithms in Search, Optimization, and Machine Learning", Addison-Wesley Professional, 1989.
-
-Mitchell, M. "An Introduction to Genetic Algorithms", MIT Press, 1998.
-
-Eiben, A.E., Smith, J.E. "Introduction to Evolutionary Computing", Springer, 2015. 
-
-Статьи
-
-Holland, J.H. "Adaptation in Natural and Artificial Systems", University of Michigan Press, 1975. 
-
-De Jong, K.A. "An Analysis of the Behavior of a Class of Genetic Adaptive Systems", Dissertation, University of Michigan, 1975. 
-
-Srinivas, M., Patnaik, L.M. "Genetic Algorithms: A Survey", IEEE Computer, 1994. 
+1. Deepa S.N., Sivanandam S.N. Introduction to genetic algorithms. Berlin, Heidelberg: Springer- Verlag, 2008.
+2. Macready W.G., Wolpert D.H. No free lunch theorems for search / Operations research Santa Fe Institute, 1995.
+3. Macready W.G., Wolpert D. H. No Free Lunch Theorems for Search Technical. 1996. Report SFI-TR-95-02-010. - Sania Fe Instituie.
+4. https://www.sciencedirect.com/science/article/abs/pii/S0925527302001044#:~:text=Genetic%20Algorithm%20programs%20include%20a,within%20a%20given%20execution%20time.
+5. https://www.obitko.com/tutorials/genetic-algorithms/parameters.php  
