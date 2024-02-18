@@ -86,7 +86,7 @@ parameters_num_parents_mating = [
 
 # Параметры для эксперимента по изменению шанс мутации 
 parameters_mutation_probability= [
-    {"pop_size": 50, "num_generations": 50, "num_parents_mating": 5, "mutation_probability": i/100} for i in range(1,100,5)
+   {"pop_size": 10, "num_generations": 10, "num_parents_mating": 5, "mutation_probability": i/100} for i in range(1,100,5)
 ]
 names={
     'pop_size': 'размер популяции',
