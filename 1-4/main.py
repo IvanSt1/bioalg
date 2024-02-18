@@ -1,108 +1,86 @@
-'''
-Давайте разработаем задачу, где генетический алгоритм (ГА) может быть использован для оптимизации, и напишем соответствующий код. Задача будет заключаться в оптимизации портфеля инвестиций, чтобы максимизировать ожидаемый доход при заданном уровне риска. Это классическая задача оптимизации, где генетические алгоритмы могут показать хорошие результаты, особенно когда пространство поиска велико и нелинейно.
-
-Задача
-Имеется набор инвестиционных активов (акции, облигации и т.д.), каждый из которых имеет свой ожидаемый доход и уровень риска. Необходимо выбрать состав портфеля таким образом, чтобы максимизировать ожидаемый доход при заданном максимально допустимом уровне риска.
-
-Параметры
-Ожидаемый доход актива определяется как процентное увеличение его стоимости.
-Уровень риска актива может быть определен как стандартное отклонение ожидаемого дохода.
-Максимально допустимый уровень риска портфеля задан заранее.
-Генетический алгоритм
-Популяция: наборы портфелей с различным составом активов.
-Фитнес-функция: соотношение ожидаемого дохода к риску портфеля, где портфели с доходностью выше и риском ниже получают более высокий фитнес.
-Операторы генетического алгоритма: кроссовер (смешивание двух портфелей для создания нового) и мутация (случайное изменение состава портфеля).
-'''
 import numpy as np
-import random
-
-# Определение актива
-class Asset:
-    def __init__(self, name, return_rate, risk):
-        self.name = name
-        self.return_rate = return_rate  # Ожидаемый доход
-        self.risk = risk  # Уровень риска
-
-# Создание начальной популяции
-def create_initial_population(size, assets, portfolio_size):
-    population = []
-    for _ in range(size):
-        portfolio = random.sample(assets, portfolio_size)
-        population.append(portfolio)
-    return population
-
-# Функция фитнеса
-def fitness(portfolio, max_risk):
-    total_return = sum(asset.return_rate for asset in portfolio)
-    total_risk = np.sqrt(sum(asset.risk ** 2 for asset in portfolio))
-    if total_risk > max_risk:
-        return 0  # Портфель слишком рискованный
-    return total_return / total_risk  # Чем выше значение, тем лучше
-
-# Селекция
-def select(population, fitness_scores, num_parents):
-    parents = sorted(zip(population, fitness_scores), key=lambda x: x[1], reverse=True)
-    return [x[0] for x in parents[:num_parents]]
-
-# Кроссовер
-def crossover(parent1, parent2):
-    child = parent1[:len(parent1)//2] + parent2[len(parent2)//2:]
-    return child
-
-# Мутация
-def mutate(portfolio, assets, mutation_rate):
-    if random.random() < mutation_rate:
-        replace_index = random.randint(0, len(portfolio) - 1)
-        portfolio[replace_index] = random.choice(assets)
-    return portfolio
-
-# Главный цикл алгоритма
-def genetic_algorithm(assets, population_size, portfolio_size, max_risk, generations, mutation_rate):
-    population = create_initial_population(population_size, assets, portfolio_size)
-    for _ in range(generations):
-        fitness_scores = [fitness(portfolio, max_risk) for portfolio in population]
-        parents = select(population, fitness_scores, population_size // 2)
-        next_generation = []
-        while len(next_generation) < population_size:
-            parent1, parent2 = random.sample(parents, 2)
-            child = crossover(parent1, parent2)
-            child = mutate(child, assets, mutation_rate)
-            next_generation.append(child)
-        population = next_generation
-    return population
-
-# Пример активов
-assets = [Asset(f"Asset {i}", random.uniform(0.05, 0.2), random.uniform(0.01, 0.05)) for i in range(10)]
-
-# Жадный метод оптимизации
-def greedy_optimization(assets, max_risk):
-    sorted_assets = sorted(assets, key=lambda x: x.return_rate / x.risk, reverse=True)
-    portfolio = []
-    total_risk = 0
-    for asset in sorted_assets:
-        if total_risk + asset.risk <= max_risk:
-            portfolio.append(asset)
-            total_risk += asset.risk
-        else:
-            break
-    return portfolio
-
-# Измерение времени выполнения и качества решения
 import time
 
-# Генетический алгоритм
-start_time_ga = time.time()
-best_portfolios_ga = genetic_algorithm(assets, 100, 5, 0.1, 50, 0.2)
-execution_time_ga = time.time() - start_time_ga
-best_fitness_ga = max(fitness(portfolio, 0.1) for portfolio in best_portfolios_ga)
+# Функция приспособленности
+def fitness(x, y):
+    return np.sin(x**2 + y**2)
 
-# Жадный алгоритм
-start_time_greedy = time.time()
-best_portfolio_greedy = greedy_optimization(assets, 0.1)
-execution_time_greedy = time.time() - start_time_greedy
-best_fitness_greedy = fitness(best_portfolio_greedy, 0.1)
+# Инициализация популяции
+def initialize_population(pop_size):
+    return np.random.uniform(-3, 3, (pop_size, 2))
 
-# Вывод результатов
-print(f"GA Execution Time: {execution_time_ga:.4f}s, Best Fitness: {best_fitness_ga}")
-print(f"Greedy Execution Time: {execution_time_greedy:.4f}s, Best Fitness: {best_fitness_greedy}")
+# Селекция
+def select(population, scores, num_parents):
+    parents = np.zeros((num_parents, population.shape[1]))
+    for parent_num in range(num_parents):
+        max_fitness_idx = np.where(scores == np.max(scores))
+        max_fitness_idx = max_fitness_idx[0][0]
+        parents[parent_num, :] = population[max_fitness_idx, :]
+        scores[max_fitness_idx] = -99999999 # Это чтобы не выбирать одного и того же родителя дважды
+    return parents
 
+# Кроссовер
+def crossover(parents, offspring_size):
+    offspring = np.zeros(offspring_size)
+    crossover_point = np.uint8(offspring_size[1]/2)
+    for k in range(offspring_size[0]):
+        parent1_idx = k % parents.shape[0]
+        parent2_idx = (k+1) % parents.shape[0]
+        offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
+        offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
+    return offspring
+
+# Мутация
+def mutation(offspring_crossover, mutation_probability):
+    for idx in range(offspring_crossover.shape[0]):
+        if np.random.rand() < mutation_probability:
+            random_value = np.random.uniform(-0.1, 0.1, 1)
+            offspring_crossover[idx, 1] += random_value
+    return offspring_crossover
+
+def genetic_algorithm(pop_size, num_generations, num_parents_mating, mutation_probability):
+    start_time = time.time()
+    population = initialize_population(pop_size)
+    for generation in range(num_generations):
+        scores = fitness(population[:, 0], population[:, 1])
+        parents = select(population, scores, num_parents_mating)
+        offspring_crossover = crossover(parents, (pop_size - parents.shape[0], 2))
+        offspring_mutation = mutation(offspring_crossover, mutation_probability)
+        population[0:parents.shape[0], :] = parents
+        population[parents.shape[0]:, :] = offspring_mutation
+        max_fitness = np.max(fitness(population[:, 0], population[:, 1]))
+        print(f"Поколение {generation}, Лучшее значение: {max_fitness}")
+    end_time = time.time()
+    print(f"Время выполнения: {end_time - start_time} секунд")
+
+# Параметры для эксперимента
+parameters = [
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 20, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 30, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 40, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 50, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 40, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 60, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 70, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 80, "num_parents_mating": 5, "mutation_probability": 0.01},
+    
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 2, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 3, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 4, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 6, "mutation_probability": 0.01},
+
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.01},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.05},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.1},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.2},
+    {"pop_size": 10, "num_generations": 20, "num_parents_mating": 5, "mutation_probability": 0.4},
+]
+
+for params in parameters:
+    print(f"Эксперимент с параметрами: {params}")
+    genetic_algorithm(params["pop_size"], params["num_generations"], params["num_parents_mating"], params["mutation_probability"])
+    print("-" * 50)
